@@ -9,16 +9,17 @@
   <PropertyGroup>
     <Product>Umbraco.Community.AI.PropertyValidation</Product>
     <PackageId>Umbraco.Community.AI.PropertyValidation</PackageId>
-    <Title>AI Property Validation</Title>
+    <Title>Umbraco.Community.AI.PropertyValidation</Title>
     <Description>AI-powered property validation for Umbraco CMS using the Umbraco.AI infrastructure.</Description>
     <PackageTags>umbraco;umbraco-marketplace;ai;validation</PackageTags>
     <Authors>Hjalte Daniel</Authors>
-    <Copyright>$([System.DateTime]::UtcNow.ToString(`yyyy`)) © Hjalte Daniel</Copyright>
+    <Copyright>$([System.DateTime]::UtcNow.ToString(`yyyy`)) © Hjalte Daniel Retz Johansson</Copyright>
     <PackageProjectUrl>https://github.com/hjaltedaniel/Umbraco.Community.AI.PropertyValidation</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hjaltedaniel/Umbraco.Community.AI.PropertyValidation</RepositoryUrl>
     <PackageReadmeFile>README_nuget.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,6 +40,13 @@
 
   <ItemGroup>
     <None Include="..\..\docs\README_nuget.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+    <ItemGroup>
+    <None Include="..\..\docs\logo.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
