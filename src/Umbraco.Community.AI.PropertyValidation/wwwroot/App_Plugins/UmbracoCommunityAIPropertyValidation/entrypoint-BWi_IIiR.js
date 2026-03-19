@@ -1,5 +1,5 @@
 import { UMB_AUTH_CONTEXT as i } from "@umbraco-cms/backoffice/auth";
-import { s } from "./api-lnISbUC5.js";
+import { s } from "./api-CtQh0b2h.js";
 const f = (o, e) => {
   o.consumeContext(i, async (n) => {
     if (!n) return;
@@ -12,4 +12,4 @@ export {
   f as onInit,
   g as onUnload
 };
-//# sourceMappingURL=entrypoint-CmKcYKZ6.js.map
+//# sourceMappingURL=entrypoint-BWi_IIiR.js.map

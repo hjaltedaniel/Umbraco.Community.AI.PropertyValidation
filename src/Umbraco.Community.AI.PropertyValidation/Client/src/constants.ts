@@ -1,10 +1,17 @@
-export const ENTITY_TYPE = "ai-property-validation-rule";
-export const ROOT_ENTITY_TYPE = "ai-property-validation-root";
+// Entity types
+export const ENTITY_TYPE = "ucai:property-validation";
+export const ROOT_ENTITY_TYPE = "ucai:property-validation-root";
 
-export const MENU_ITEM_ALIAS = "UmbracoAIPropertyValidation.MenuItem";
-export const WORKSPACE_ALIAS = "UmbracoAIPropertyValidation.Workspace.Rule";
-export const ROOT_WORKSPACE_ALIAS = "UmbracoAIPropertyValidation.Workspace.Root";
+// Workspace aliases
+export const WORKSPACE_ALIAS = "UmbracoCommunityAI.Workspace.PropertyValidation";
+export const ROOT_WORKSPACE_ALIAS = "UmbracoCommunityAI.Workspace.PropertyValidationRoot";
 
-export const ADDONS_MENU_ALIAS = "Uai.Menu.Addons";
+// Menu
+export const MENU_ITEM_ALIAS = "UmbracoCommunityAI.MenuItem.PropertyValidation";
+export const AI_SETTINGS_MENU_ALIAS = "Uai.Menu.Addons";
 
+// Icon
+export const ICON = "icon-check";
+
+// API
 export const API_BASE = "/umbraco/umbracocommunityaipropertyvalidation/api/v1";

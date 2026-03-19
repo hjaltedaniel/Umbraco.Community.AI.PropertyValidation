@@ -17,14 +17,15 @@ public class PropertyValidationService : IPropertyValidationService
     private readonly IPropertyValidationRuleRepository _repository;
     private readonly ILogger<PropertyValidationService> _logger;
 
-    private const string SystemPrompt =
+    private const string SystemPromptTemplate =
         """
         You are a content validation assistant for a CMS. You will receive a validation rule and a property value.
         Evaluate the value against the rule.
         Respond ONLY with valid JSON in this exact format:
-        {"valid": true} if the value passes validation.
-        {"valid": false, "reason": "A concise explanation of why it failed and how to fix it"} if it fails.
+        {{"valid": true}} if the value passes validation.
+        {{"valid": false, "reason": "A concise explanation of why it failed and how to fix it"}} if it fails.
         Do not include any text outside the JSON object.
+        {0}
         """;
 
     public PropertyValidationService(
@@ -63,15 +64,37 @@ public class PropertyValidationService : IPropertyValidationService
             if (string.IsNullOrWhiteSpace(propertyValue))
                 return null;
 
-            var profile = await _profileService.GetProfileByAliasAsync(rule.ProfileAlias, cancellationToken);
-            if (profile is null)
+            // ProfileAlias can be either a GUID (from the picker) or an alias string
+            Guid profileId;
+            if (Guid.TryParse(rule.ProfileAlias, out profileId))
             {
-                _logger.LogWarning("AI profile '{ProfileAlias}' not found for validation rule '{RuleName}'", rule.ProfileAlias, rule.Name);
-                return null;
+                // It's a GUID — look up by ID directly
+                var profile = await _profileService.GetProfileAsync(profileId, cancellationToken);
+                if (profile is null)
+                {
+                    _logger.LogWarning("AI profile with ID '{ProfileId}' not found for validation rule '{RuleName}'", rule.ProfileAlias, rule.Name);
+                    return null;
+                }
+            }
+            else
+            {
+                // It's an alias — look up by alias
+                var profile = await _profileService.GetProfileByAliasAsync(rule.ProfileAlias, cancellationToken);
+                if (profile is null)
+                {
+                    _logger.LogWarning("AI profile '{ProfileAlias}' not found for validation rule '{RuleName}'", rule.ProfileAlias, rule.Name);
+                    return null;
+                }
+                profileId = profile.Id;
             }
 
+            var guardrailsSection = string.IsNullOrWhiteSpace(rule.Guardrails)
+                ? string.Empty
+                : $"\nAdditional guardrails you must follow:\n{rule.Guardrails}";
+            var systemPrompt = string.Format(SystemPromptTemplate, guardrailsSection);
+
             var userPrompt = $"""
-                Validation rule: {rule.Prompt}
+                Validation rule: {rule.Instructions}
 
                 Property value to validate:
                 ---
@@ -81,7 +104,7 @@ public class PropertyValidationService : IPropertyValidationService
 
             var messages = new List<ChatMessage>
             {
-                new(ChatRole.System, SystemPrompt),
+                new(ChatRole.System, systemPrompt),
                 new(ChatRole.User, userPrompt),
             };
 
@@ -90,7 +113,7 @@ public class PropertyValidationService : IPropertyValidationService
 
             #pragma warning disable CS0618 // Using profile-based overload for compatibility with Umbraco.AI 1.x
             var response = await _chatService.GetChatResponseAsync(
-                profile.Id,
+                profileId,
                 messages,
                 cancellationToken: timeoutCts.Token);
             #pragma warning restore CS0618

@@ -1,146 +1,138 @@
-import {
-  ENTITY_TYPE,
-  ROOT_ENTITY_TYPE,
-  MENU_ITEM_ALIAS,
-  WORKSPACE_ALIAS,
-  ROOT_WORKSPACE_ALIAS,
-  AI_SETTINGS_MENU_ALIAS,
-  ICON,
-} from "../constants.js";
-
-export const manifests: Array<UmbExtensionManifest> = [
+const e = [
+  {
+    name: "Umbraco Community AIProperty Validation Entrypoint",
+    alias: "Umbraco.Community.AI.PropertyValidation.Entrypoint",
+    type: "backofficeEntryPoint",
+    js: () => import("./entrypoint-BWi_IIiR.js")
+  }
+], n = "ucai:property-validation", o = "ucai:property-validation-root", a = "UmbracoCommunityAI.Workspace.PropertyValidation", t = "UmbracoCommunityAI.Workspace.PropertyValidationRoot", r = "UmbracoCommunityAI.MenuItem.PropertyValidation", m = "Uai.Menu.Addons", i = "icon-check", s = "/umbraco/umbracocommunityaipropertyvalidation/api/v1", c = [
   // ── Menu Item (appears under AI sidebar in Settings section) ──
   {
     type: "menuItem",
-    alias: MENU_ITEM_ALIAS,
+    alias: r,
     name: "Property Validation Menu Item",
     weight: 60,
     meta: {
       label: "Property Validation",
-      icon: ICON,
-      entityType: ROOT_ENTITY_TYPE,
-      menus: [AI_SETTINGS_MENU_ALIAS],
-    },
+      icon: i,
+      entityType: o,
+      menus: [m]
+    }
   },
-
   // ── Root Workspace (collection / list view) ──
   {
     type: "workspace",
     kind: "default",
-    alias: ROOT_WORKSPACE_ALIAS,
+    alias: t,
     name: "Property Validation Root Workspace",
     meta: {
-      entityType: ROOT_ENTITY_TYPE,
-      headline: "Property Validation",
-    },
+      entityType: o,
+      headline: "Property Validation"
+    }
   },
   {
     type: "workspaceView",
     alias: "UmbracoCommunityAI.WorkspaceView.PropertyValidationRoot.Collection",
     name: "Property Validation Root Collection View",
-    element: () => import("./views/validation-rule-collection.element.js"),
+    element: () => import("./validation-rule-collection.element-fnmFPFzT.js"),
     weight: 100,
     meta: {
       label: "Rules",
       pathname: "rules",
-      icon: ICON,
+      icon: i
     },
     conditions: [
       {
         alias: "Umb.Condition.WorkspaceAlias",
-        match: ROOT_WORKSPACE_ALIAS,
-      },
-    ],
+        match: t
+      }
+    ]
   },
-
   // ── Detail Workspace (edit individual rule — routable) ──
   {
     type: "workspace",
     kind: "routable",
-    alias: WORKSPACE_ALIAS,
+    alias: a,
     name: "Property Validation Rule Workspace",
-    element: () => import("./validation-rule-workspace-editor.element.js"),
+    element: () => import("./validation-rule-workspace-editor.element-BjwuDjqA.js"),
     meta: {
-      entityType: ENTITY_TYPE,
-    },
+      entityType: n
+    }
   },
-
   // ── Workspace Views (tabs) ──
   {
     type: "workspaceView",
     alias: "UmbracoCommunityAI.Workspace.PropertyValidation.View.Settings",
     name: "Property Validation Settings View",
-    element: () => import("./views/validation-rule-settings.element.js"),
+    element: () => import("./validation-rule-settings.element-BWTEUgq9.js"),
     weight: 300,
     meta: {
       label: "Settings",
       pathname: "settings",
-      icon: "icon-settings",
+      icon: "icon-settings"
     },
     conditions: [
       {
         alias: "Umb.Condition.WorkspaceAlias",
-        match: WORKSPACE_ALIAS,
-      },
-    ],
+        match: a
+      }
+    ]
   },
   {
     type: "workspaceView",
     alias: "UmbracoCommunityAI.Workspace.PropertyValidation.View.Governance",
     name: "Property Validation Governance View",
-    element: () => import("./views/validation-rule-governance.element.js"),
+    element: () => import("./validation-rule-governance.element-CGgMjUt6.js"),
     weight: 200,
     meta: {
       label: "Governance",
       pathname: "governance",
-      icon: "icon-shield",
+      icon: "icon-shield"
     },
     conditions: [
       {
         alias: "Umb.Condition.WorkspaceAlias",
-        match: WORKSPACE_ALIAS,
-      },
-    ],
+        match: a
+      }
+    ]
   },
   {
     type: "workspaceView",
     alias: "UmbracoCommunityAI.Workspace.PropertyValidation.View.Info",
     name: "Property Validation Info View",
-    element: () => import("./views/validation-rule-info.element.js"),
+    element: () => import("./validation-rule-info.element-BaPmN3O5.js"),
     weight: 100,
     meta: {
       label: "Info",
       pathname: "info",
-      icon: "icon-info",
+      icon: "icon-info"
     },
     conditions: [
       {
         alias: "Umb.Condition.WorkspaceAlias",
-        match: WORKSPACE_ALIAS,
-      },
-    ],
+        match: a
+      }
+    ]
   },
-
   // ── Workspace Action: Save ──
   {
     type: "workspaceAction",
     kind: "default",
     alias: "UmbracoCommunityAI.WorkspaceAction.PropertyValidation.Save",
     name: "Save Property Validation Rule",
-    api: () => import("./actions/save-validation-rule.action.js"),
+    api: () => import("./save-validation-rule.action-DxG0eOVS.js"),
     meta: {
       label: "Save",
       look: "primary",
-      color: "positive",
+      color: "positive"
     },
     conditions: [
       {
         alias: "Umb.Condition.WorkspaceAlias",
-        match: WORKSPACE_ALIAS,
-      },
-    ],
+        match: a
+      }
+    ]
   },
-
   // ── Entity Actions ──
   {
     type: "entityAction",
@@ -148,11 +140,22 @@ export const manifests: Array<UmbExtensionManifest> = [
     alias: "UmbracoCommunityAI.EntityAction.PropertyValidation.Create",
     name: "Create Validation Rule Entity Action",
     weight: 1200,
-    api: () => import("./actions/create-validation-rule.action.js"),
-    forEntityTypes: [ROOT_ENTITY_TYPE],
+    api: () => import("./create-validation-rule.action-Dwwd3e7q.js"),
+    forEntityTypes: [o],
     meta: {
       icon: "icon-add",
-      label: "Create",
-    },
-  },
+      label: "Create"
+    }
+  }
+], p = [
+  ...e,
+  ...c
 ];
+export {
+  s as A,
+  n as E,
+  o as R,
+  a as W,
+  p as m
+};
+//# sourceMappingURL=bundle.manifests-lIuvScO3.js.map

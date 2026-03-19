@@ -1,31 +1,49 @@
-const API_PATH = "/umbraco/umbracocommunityaipropertyvalidation/api/v1";
+import { API_BASE } from "./constants.js";
+
+// ---- Types ----
 
 export interface ValidationRuleModel {
   key: string;
   name: string;
+  alias: string;
   contentTypeAlias: string;
   propertyAlias: string;
   profileAlias: string;
-  prompt: string;
+  instructions: string;
+  guardrails: string | null;
   validateOn: number;
   failureLevel: number;
   isEnabled: boolean;
+  version: number;
   createDate: string;
   updateDate: string;
 }
 
 export interface CreateUpdateRuleModel {
   name: string;
+  alias: string;
   contentTypeAlias: string;
   propertyAlias: string;
   profileAlias: string;
-  prompt: string;
+  instructions: string;
+  guardrails: string | null;
   validateOn: number;
   failureLevel: number;
   isEnabled: boolean;
 }
 
-// Auth token provider - set by the entrypoint once UMB_AUTH_CONTEXT is available
+export interface ValidationRuleVersionModel {
+  id: number;
+  ruleKey: string;
+  version: number;
+  name: string;
+  changedBy: string | null;
+  changeDescription: string | null;
+  changeDate: string;
+}
+
+// ---- Auth token provider ----
+
 let _getToken: (() => Promise<string | undefined>) | undefined;
 
 export function setTokenProvider(fn: () => Promise<string | undefined>) {
@@ -44,7 +62,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     }
   }
 
-  const response = await fetch(`${API_PATH}${path}`, {
+  const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       ...headers,
@@ -54,12 +72,16 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+    const errorBody = await response.text();
+    console.error(`API error ${response.status}:`, errorBody);
+    throw new Error(`API error: ${response.status} ${response.statusText} - ${errorBody}`);
   }
 
   const text = await response.text();
   return text ? JSON.parse(text) : (undefined as unknown as T);
 }
+
+// ---- API client ----
 
 export const validationRuleApi = {
   getAll: () => apiFetch<ValidationRuleModel[]>("/rule"),
@@ -82,4 +104,18 @@ export const validationRuleApi = {
     apiFetch<void>(`/rule/${key}`, {
       method: "DELETE",
     }),
+
+  getVersions: (key: string) =>
+    apiFetch<ValidationRuleVersionModel[]>(`/rule/${key}/versions`),
+
+  getDocumentTypes: (query?: string) =>
+    apiFetch<string[]>(`/utils/document-types${query ? `?query=${encodeURIComponent(query)}` : ""}`),
+
+  getPropertyAliases: (contentTypeAlias?: string, query?: string) => {
+    const params = new URLSearchParams();
+    if (contentTypeAlias) params.set("contentTypeAlias", contentTypeAlias);
+    if (query) params.set("query", query);
+    const qs = params.toString();
+    return apiFetch<string[]>(`/utils/property-aliases${qs ? `?${qs}` : ""}`);
+  },
 };

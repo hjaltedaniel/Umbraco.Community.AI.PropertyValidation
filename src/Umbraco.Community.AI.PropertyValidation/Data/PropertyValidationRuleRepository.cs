@@ -19,7 +19,7 @@ public class PropertyValidationRuleRepository : IPropertyValidationRuleRepositor
     public async Task<IEnumerable<PropertyValidationRule>> GetAllAsync()
     {
         using var scope = _scopeProvider.CreateScope();
-        var sql = new Sql($"SELECT * FROM {PropertyValidationRuleSchema.TableName}");
+        var sql = new Sql($"SELECT * FROM {PropertyValidationRuleSchema.TableName} ORDER BY Name");
         var rows = await scope.Database.FetchAsync<PropertyValidationRuleSchema>(sql);
         scope.Complete();
         return rows.Select(MapToModel);
@@ -50,7 +50,7 @@ public class PropertyValidationRuleRepository : IPropertyValidationRuleRepositor
             .Select(MapToModel);
     }
 
-    public async Task<PropertyValidationRule> SaveAsync(PropertyValidationRule rule)
+    public async Task<PropertyValidationRule> SaveAsync(PropertyValidationRule rule, string? changedBy = null)
     {
         using var scope = _scopeProvider.CreateScope();
         var now = DateTime.UtcNow;
@@ -60,30 +60,44 @@ public class PropertyValidationRuleRepository : IPropertyValidationRuleRepositor
 
         if (existing is null)
         {
+            // New rule
             if (rule.Key == Guid.Empty)
                 rule.Key = Guid.NewGuid();
 
+            rule.Version = 1;
             var schema = MapToSchema(rule);
             schema.CreateDate = now;
             schema.UpdateDate = now;
             await scope.Database.InsertAsync(schema);
             rule.CreateDate = schema.CreateDate;
             rule.UpdateDate = schema.UpdateDate;
+
+            // Create initial version record
+            await CreateVersionRecordAsync(scope, rule, changedBy, "Created");
         }
         else
         {
+            // Update existing - increment version
+            rule.Version = existing.Version + 1;
+
             existing.Name = rule.Name;
+            existing.Alias = rule.Alias;
             existing.ContentTypeAlias = rule.ContentTypeAlias;
             existing.PropertyAlias = rule.PropertyAlias;
             existing.ProfileAlias = rule.ProfileAlias;
-            existing.Prompt = rule.Prompt;
+            existing.Instructions = rule.Instructions;
+            existing.Guardrails = rule.Guardrails;
             existing.ValidateOn = (int)rule.ValidateOn;
             existing.FailureLevel = (int)rule.FailureLevel;
             existing.IsEnabled = rule.IsEnabled;
+            existing.Version = rule.Version;
             existing.UpdateDate = now;
             await scope.Database.UpdateAsync(existing);
             rule.CreateDate = existing.CreateDate;
             rule.UpdateDate = existing.UpdateDate;
+
+            // Create version record
+            await CreateVersionRecordAsync(scope, rule, changedBy, "Updated");
         }
 
         scope.Complete();
@@ -102,22 +116,61 @@ public class PropertyValidationRuleRepository : IPropertyValidationRuleRepositor
             return false;
         }
 
+        // Delete version history
+        var deleteVersionsSql = new Sql($"DELETE FROM {PropertyValidationRuleVersionSchema.TableName} WHERE RuleKey = @0", key);
+        await scope.Database.ExecuteAsync(deleteVersionsSql);
+
         await scope.Database.DeleteAsync(existing);
         scope.Complete();
         return true;
+    }
+
+    public async Task<IEnumerable<PropertyValidationRuleVersion>> GetVersionsAsync(Guid ruleKey)
+    {
+        using var scope = _scopeProvider.CreateScope();
+        var sql = new Sql($"SELECT * FROM {PropertyValidationRuleVersionSchema.TableName} WHERE RuleKey = @0 ORDER BY Version DESC", ruleKey);
+        var rows = await scope.Database.FetchAsync<PropertyValidationRuleVersionSchema>(sql);
+        scope.Complete();
+        return rows.Select(MapVersionToModel);
+    }
+
+    private async Task CreateVersionRecordAsync(IScope scope, PropertyValidationRule rule, string? changedBy, string changeDescription)
+    {
+        var versionSchema = new PropertyValidationRuleVersionSchema
+        {
+            RuleKey = rule.Key,
+            Version = rule.Version,
+            Name = rule.Name,
+            Alias = rule.Alias,
+            ContentTypeAlias = rule.ContentTypeAlias,
+            PropertyAlias = rule.PropertyAlias,
+            ProfileAlias = rule.ProfileAlias,
+            Instructions = rule.Instructions,
+            Guardrails = rule.Guardrails,
+            ValidateOn = (int)rule.ValidateOn,
+            FailureLevel = (int)rule.FailureLevel,
+            IsEnabled = rule.IsEnabled,
+            ChangedBy = changedBy,
+            ChangeDescription = changeDescription,
+            ChangeDate = DateTime.UtcNow,
+        };
+        await scope.Database.InsertAsync(versionSchema);
     }
 
     private static PropertyValidationRule MapToModel(PropertyValidationRuleSchema schema) => new()
     {
         Key = schema.Key,
         Name = schema.Name,
+        Alias = schema.Alias,
         ContentTypeAlias = schema.ContentTypeAlias,
         PropertyAlias = schema.PropertyAlias,
         ProfileAlias = schema.ProfileAlias,
-        Prompt = schema.Prompt,
+        Instructions = schema.Instructions,
+        Guardrails = schema.Guardrails,
         ValidateOn = (ValidateOn)schema.ValidateOn,
         FailureLevel = (FailureLevel)schema.FailureLevel,
         IsEnabled = schema.IsEnabled,
+        Version = schema.Version,
         CreateDate = schema.CreateDate,
         UpdateDate = schema.UpdateDate,
     };
@@ -126,14 +179,37 @@ public class PropertyValidationRuleRepository : IPropertyValidationRuleRepositor
     {
         Key = rule.Key,
         Name = rule.Name,
+        Alias = rule.Alias,
         ContentTypeAlias = rule.ContentTypeAlias,
         PropertyAlias = rule.PropertyAlias,
         ProfileAlias = rule.ProfileAlias,
-        Prompt = rule.Prompt,
+        Instructions = rule.Instructions,
+        Guardrails = rule.Guardrails,
         ValidateOn = (int)rule.ValidateOn,
         FailureLevel = (int)rule.FailureLevel,
         IsEnabled = rule.IsEnabled,
+        Version = rule.Version,
         CreateDate = rule.CreateDate,
         UpdateDate = rule.UpdateDate,
+    };
+
+    private static PropertyValidationRuleVersion MapVersionToModel(PropertyValidationRuleVersionSchema schema) => new()
+    {
+        Id = schema.Id,
+        RuleKey = schema.RuleKey,
+        Version = schema.Version,
+        Name = schema.Name,
+        Alias = schema.Alias,
+        ContentTypeAlias = schema.ContentTypeAlias,
+        PropertyAlias = schema.PropertyAlias,
+        ProfileAlias = schema.ProfileAlias,
+        Instructions = schema.Instructions,
+        Guardrails = schema.Guardrails,
+        ValidateOn = (ValidateOn)schema.ValidateOn,
+        FailureLevel = (FailureLevel)schema.FailureLevel,
+        IsEnabled = schema.IsEnabled,
+        ChangedBy = schema.ChangedBy,
+        ChangeDescription = schema.ChangeDescription,
+        ChangeDate = schema.ChangeDate,
     };
 }

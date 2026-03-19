@@ -1,24 +1,21 @@
 import {
-  LitElement,
   html,
   customElement,
   state,
 } from "@umbraco-cms/backoffice/external/lit";
-import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
+import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 import { validationRuleApi, type ValidationRuleModel } from "../api.js";
-import { ENTITY_TYPE, ROOT_ENTITY_TYPE } from "../constants.js";
+import { ENTITY_TYPE, ROOT_ENTITY_TYPE, ICON } from "../constants.js";
 
-@customElement("ai-property-validation-menu-item")
-export class AiPropertyValidationMenuItemElement extends UmbElementMixin(
-  LitElement
-) {
+@customElement("ucai-validation-rule-menu-item")
+export class ValidationRuleMenuItemElement extends UmbLitElement {
   @state()
   private _rules: ValidationRuleModel[] = [];
 
   @state()
   private _loading = true;
 
-  connectedCallback() {
+  override connectedCallback() {
     super.connectedCallback();
     this.#loadRules();
   }
@@ -34,23 +31,31 @@ export class AiPropertyValidationMenuItemElement extends UmbElementMixin(
     }
   }
 
-  render() {
+  #getRootPath(): string {
+    return `section/ai/workspace/${ROOT_ENTITY_TYPE}`;
+  }
+
+  #getEditPath(key: string): string {
+    return `section/ai/workspace/${ENTITY_TYPE}/edit/${key}`;
+  }
+
+  override render() {
     return html`
       <uui-menu-item
         label="Property Validation"
-        href=${`section/ai/workspace/${ROOT_ENTITY_TYPE}`}
+        href=${this.#getRootPath()}
         ?has-children=${this._rules.length > 0}
       >
-        <uui-icon slot="icon" name="icon-check"></uui-icon>
+        <uui-icon slot="icon" name=${ICON}></uui-icon>
         ${this._loading
           ? html`<uui-loader slot="actions"></uui-loader>`
           : this._rules.map(
               (rule) => html`
                 <uui-menu-item
                   label=${rule.name}
-                  href=${`section/ai/workspace/${ENTITY_TYPE}/edit/${rule.key}`}
+                  href=${this.#getEditPath(rule.key)}
                 >
-                  <uui-icon slot="icon" name="icon-check"></uui-icon>
+                  <uui-icon slot="icon" name=${ICON}></uui-icon>
                 </uui-menu-item>
               `
             )}
@@ -59,10 +64,10 @@ export class AiPropertyValidationMenuItemElement extends UmbElementMixin(
   }
 }
 
-export default AiPropertyValidationMenuItemElement;
+export default ValidationRuleMenuItemElement;
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ai-property-validation-menu-item": AiPropertyValidationMenuItemElement;
+    "ucai-validation-rule-menu-item": ValidationRuleMenuItemElement;
   }
 }

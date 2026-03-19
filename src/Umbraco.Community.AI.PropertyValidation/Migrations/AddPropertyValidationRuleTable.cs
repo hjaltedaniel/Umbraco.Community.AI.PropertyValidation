@@ -15,5 +15,10 @@ public class AddPropertyValidationRuleTable : MigrationBase
         {
             Create.Table<PropertyValidationRuleSchema>().Do();
         }
+
+        if (!TableExists(PropertyValidationRuleVersionSchema.TableName))
+        {
+            Create.Table<PropertyValidationRuleVersionSchema>().Do();
+        }
     }
 }

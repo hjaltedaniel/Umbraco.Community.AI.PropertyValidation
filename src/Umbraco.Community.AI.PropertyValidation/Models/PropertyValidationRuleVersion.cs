@@ -1,8 +1,13 @@
-namespace Umbraco.Community.AI.PropertyValidation.Api.Models;
+namespace Umbraco.Community.AI.PropertyValidation.Models;
 
-public class PropertyValidationRuleResponse
+/// <summary>
+/// Represents a historical version of a validation rule for audit/info tracking.
+/// </summary>
+public class PropertyValidationRuleVersion
 {
-    public Guid Key { get; set; }
+    public int Id { get; set; }
+    public Guid RuleKey { get; set; }
+    public int Version { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Alias { get; set; } = string.Empty;
     public string ContentTypeAlias { get; set; } = string.Empty;
@@ -10,20 +15,9 @@ public class PropertyValidationRuleResponse
     public string ProfileAlias { get; set; } = string.Empty;
     public string Instructions { get; set; } = string.Empty;
     public string? Guardrails { get; set; }
-    public int ValidateOn { get; set; }
-    public int FailureLevel { get; set; }
+    public ValidateOn ValidateOn { get; set; }
+    public FailureLevel FailureLevel { get; set; }
     public bool IsEnabled { get; set; }
-    public int Version { get; set; }
-    public DateTime CreateDate { get; set; }
-    public DateTime UpdateDate { get; set; }
-}
-
-public class PropertyValidationRuleVersionResponse
-{
-    public int Id { get; set; }
-    public Guid RuleKey { get; set; }
-    public int Version { get; set; }
-    public string Name { get; set; } = string.Empty;
     public string? ChangedBy { get; set; }
     public string? ChangeDescription { get; set; }
     public DateTime ChangeDate { get; set; }

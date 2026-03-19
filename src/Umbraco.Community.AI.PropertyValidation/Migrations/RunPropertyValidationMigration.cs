@@ -35,7 +35,8 @@ public class RunPropertyValidationMigration : INotificationHandler<UmbracoApplic
 
         var plan = new MigrationPlan("Umbraco.Community.AI.PropertyValidation");
         plan.From(string.Empty)
-            .To<AddPropertyValidationRuleTable>("propertyvalidation-001");
+            .To<AddPropertyValidationRuleTable>("propertyvalidation-001")
+            .To<AddVersioningAndGuardrails>("propertyvalidation-002");
 
         var upgrader = new Upgrader(plan);
         upgrader.Execute(_migrationPlanExecutor, _coreScopeProvider, _keyValueService);

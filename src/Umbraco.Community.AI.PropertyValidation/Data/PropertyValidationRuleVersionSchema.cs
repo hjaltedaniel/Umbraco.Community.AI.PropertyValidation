@@ -6,16 +6,19 @@ namespace Umbraco.Community.AI.PropertyValidation.Data;
 [TableName(TableName)]
 [PrimaryKey("Id", AutoIncrement = true)]
 [ExplicitColumns]
-public class PropertyValidationRuleSchema
+public class PropertyValidationRuleVersionSchema
 {
-    public const string TableName = "umbracoAIPropertyValidationRule";
+    public const string TableName = "umbracoAIPropertyValidationRuleVersion";
 
     [Column("Id")]
     [PrimaryKeyColumn(AutoIncrement = true)]
     public int Id { get; set; }
 
-    [Column("Key")]
-    public Guid Key { get; set; }
+    [Column("RuleKey")]
+    public Guid RuleKey { get; set; }
+
+    [Column("Version")]
+    public int Version { get; set; }
 
     [Column("Name")]
     public string Name { get; set; } = string.Empty;
@@ -48,14 +51,16 @@ public class PropertyValidationRuleSchema
     public int FailureLevel { get; set; }
 
     [Column("IsEnabled")]
-    public bool IsEnabled { get; set; } = true;
+    public bool IsEnabled { get; set; }
 
-    [Column("Version")]
-    public int Version { get; set; } = 1;
+    [Column("ChangedBy")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public string? ChangedBy { get; set; }
 
-    [Column("CreateDate")]
-    public DateTime CreateDate { get; set; }
+    [Column("ChangeDescription")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public string? ChangeDescription { get; set; }
 
-    [Column("UpdateDate")]
-    public DateTime UpdateDate { get; set; }
+    [Column("ChangeDate")]
+    public DateTime ChangeDate { get; set; }
 }
