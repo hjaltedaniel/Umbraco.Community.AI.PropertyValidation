@@ -1,0 +1,14 @@
+{
+    "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json", 
+    "AuthorDetails": {
+      "Name": "Hjalte Daniel",
+      "ImageUrl": "https://github.com/hjaltedaniel.png"
+    },
+    "Category": "",
+    "Description": "",
+    "LicenseTypes": [ "Free" ],
+    "IssueTrackerUrl": "https://github.com/hjaltedaniel/Umbraco.Community.AI.PropertyValidation/issues",
+    "PackageType": "Package",
+    "Tags": [],
+    "Title": "AI Property Validation"
+  }

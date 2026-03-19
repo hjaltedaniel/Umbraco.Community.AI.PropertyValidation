@@ -1,0 +1,14 @@
+{
+  "id": "Umbraco.Community.AI.PropertyValidation",
+  "name": "Umbraco.Community.AI.PropertyValidation",
+  "version": "0.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "name": "Umbraco Community AIProperty Validation Bundle",
+      "alias": "Umbraco.Community.AI.PropertyValidation.Bundle",
+      "type": "bundle",
+      "js": "/App_Plugins/UmbracoCommunityAIPropertyValidation/umbraco-community-ai-property-validation.js"
+    }
+  ]
+}
