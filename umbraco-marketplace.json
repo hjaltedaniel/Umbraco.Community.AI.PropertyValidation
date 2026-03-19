@@ -1,14 +1,27 @@
-{
+  {
     "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json", 
     "AuthorDetails": {
-      "Name": "Hjalte Daniel",
-      "ImageUrl": "https://github.com/hjaltedaniel.png"
+      "Name": "Hjalte Daniel Retz Johansson",
+      "Description": "Hjalte works at Umbraco HQ. This package is provided in a personal capacity.",
+      "Url": "https://hjaltedaniel.io",
+      "ImageUrl": "https://hjaltedaniel.io/img/profile.4fd21683.jpg"
     },
-    "Category": "",
-    "Description": "",
+    "Category": "Artifical Intelligence",
+    "AlternateCategory": "Editor Tools",
+    "Description": "Property Validation for Umbraco.AI - create, organize, and execute validation on properties to ensure compliance, consistency and a second pair of eyes when saving and publishing content.",
     "LicenseTypes": [ "Free" ],
     "IssueTrackerUrl": "https://github.com/hjaltedaniel/Umbraco.Community.AI.PropertyValidation/issues",
     "PackageType": "Package",
-    "Tags": [],
-    "Title": "AI Property Validation"
+    "RelatedPackages": [
+        {
+            "PackageId": "Umbraco.AI",
+            "Description": "Core AI integration layer for Umbraco CMS"
+        },
+        {
+            "PackageId": "Umbraco.AI.OpenAI",
+            "Description": "OpenAI provider for Umbraco.AI"
+        }
+    ],
+    "Tags": ["umbraco", "ai", "prompt", "templates"],
+    "Title": "Umbraco.Community.AI.PropertyValidation"
   }
