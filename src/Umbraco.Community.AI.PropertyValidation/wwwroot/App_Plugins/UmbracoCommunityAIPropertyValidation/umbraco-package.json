@@ -1,7 +1,7 @@
 {
   "id": "Umbraco.Community.AI.PropertyValidation",
   "name": "Umbraco.Community.AI.PropertyValidation",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "allowTelemetry": true,
   "extensions": [
     {
